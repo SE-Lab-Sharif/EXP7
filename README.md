@@ -4,7 +4,7 @@
 
 ## سوالات
 
-### سوال۱
+### سوال ۱
 هر یک از مفاهیم زیر را به ترتیب توضیح می‌دهیم:
 
 <ul>
@@ -15,6 +15,34 @@
   <a href="https://www.productplan.com/glossary/technical-debt/"> source </a>
   <li> بوی بد: code smell به بخشی از قطعه‌ای کد گفته می‌شود که نشانگر مشکلات عمیق‌تر و جدی‌تر (شامل flaw در طراحی و یا معماری آن کد) می باشد، هرچند آن قطعه کد به درستی کار کند. درواقع bad smell پتانسیل‌ آن کد در malfunction در شرایط متفاوتی را بیان می‌کند که سبب مشکلات عمیق‌تری می‌شوند (مثلا عدم توانایی در extend کردن سیستم بعدها، و یا پایین آوردن maintainability و ...). این مشکلات می‌توانند در نهایت باعث کیفیت پایین کد و technical debt شوند.</li>
   <a href="https://www.opsera.io/blog/what-is-code-smell#:~:text=Code%20Smells%20are%20the%20traces,code%20quality%20and%20technical%20debt."> source </a>
+  </ul>
+  
+  ### سوال ۲
+  دسته‌بندی‌های refactoring guru را از code smell توضیح‌ می‌دهیم:
+  <ul>
+    <li> نوع bloaters: این نوع (bloaters) از code smell به زمانی گفته می‌شود که قطعه کدی، کلاسی و یا متدی آنقدر بزرگ و حجیم شده باشد که کار کردن با آن دشوار باشد. این نوع از code smell معمولا به یکباره بوجود نمی‌آید بلکه با گذر زمان، کم‌کم به حجم آن اضافه می‌شود و درنهایت maintainability و extensibility و readability را کم می‌کند.
+    </li>
+    <li>
+    نوع Object Oriented Abusers: این نوع از code smell درنتیجه‌ی نفهمیدن درست یا اشتباه در استفاده کردن از اصول و قواعد object oriented programming نشئت می‌گیرند. (مثلا inheritance یا polymorphism یا ...) و درنهایت باعث طراحی inefficient و low quality می‌شوند.
+    </li>
+    <li>
+    نوع Change Preventers: این نوع از code smell زمانی اتفاق می‌افتد که وقتی بخواهیم تغییری در کد ایجاد کنیم، نیاز باشد تا تغییرات زیادی در بخش‌های دیگری از کد نیز اعمال کنیم. درواقع، تغییرپذیری کد و extensibility آن کاهش می‌یابد.
+    </li>
+    <li>
+    نوع Dispensables: این نوع از code smell زمانی اتفاق می‌افتد که قطعه‌ای از کد، کلاس یا متدی وجود داشته باشد که اصلا استفاده نمی‌شود. این نوع از code smell باعث افزایش complexity و کاهش readability می‌شود. درواقع با حذف این قطعه‌های اضافه (dispensable) به خوانایی و تمیزی کد کمک می‌کنیم.
+    </li>
+    <li>
+    نوع Couplers: این نوع از code smell زمانی اتفاق می‌افتد که قطعه‌ای از کد، کلاس یا متدی وجود داشته باشد که به طور مستقیم به دیگر قطعه‌های کد متصل شده باشد. این نوع از code smell باعث افزایش coupling و کاهش cohesion می‌شود. این یعنی componentهای ما بیش از حد به هم وابسته هستند و این، تست و develop و extend کد را با سختی زیادی مواجه می‌کند.
+    </li>
+  </ul>
 
+  <a href="https://refactoring.guru/refactorings/smells"> source </a>
 
-</ul>
+  ### سوال ۳
+  در مورد code smell با عنوان Lazy Class توضیحات زیر را می‌دهیم:
+
+  <ol>
+    <li> این نوع از code smell در دسته‌ی Dispensables قرار می‌گیرد. درواقع تعریف آن این است که "اگر کلاسی به اندازه‌ی کافی کار و operation انجام نمی‌دهد که توجه شما را به خود جلب کند، آنرا حذف کنید! زیرا نگهداری و توسعه‌ی class ها زمان و انرژی می‌برد."</li>
+    <li> برای component هایی که تقریبا useless هستند، باید از بازآرایی Inline Class استفاده کنیم. برای subclass هایی با توابع کم،‌ از بازآرایی Collapse Hierarchy استفاده می‌کنیم.</li>
+    <li> گاهی اوقات یک lazy class در اثر تعیین کردن اهداف development در آینده ایجاد می‌شود. باید حواسمان به این trade-off باشد و یک بالانس نسبی بین clarity و simplicity در کد برقرار کنیم و مراقب باشیم که با حدف این lazu class ها، future development ما کند نشود. (در این شرایط معمولا حذف lazy class کار صحیحی نیست. چون بعدا قرار است از این حالت lazy بودن خارج شود.)</li>
+  </ol>
