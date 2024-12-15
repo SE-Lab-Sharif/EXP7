@@ -1,6 +1,6 @@
 # آزمایش هفتم
 
-توضیحات هر کدام از ریفکنورها در این قسمت باید بیاید!
+توضیحات هر کدام از ریفکتورها در این قسمت باید بیاید!
 
 ## سوالات
 
@@ -46,3 +46,288 @@
     <li> برای component هایی که تقریبا useless هستند، باید از بازآرایی Inline Class استفاده کنیم. برای subclass هایی با توابع کم،‌ از بازآرایی Collapse Hierarchy استفاده می‌کنیم.</li>
     <li> گاهی اوقات یک lazy class در اثر تعیین کردن اهداف development در آینده ایجاد می‌شود. باید حواسمان به این trade-off باشد و یک بالانس نسبی بین clarity و simplicity در کد برقرار کنیم و مراقب باشیم که با حدف این lazu class ها، future development ما کند نشود. (در این شرایط معمولا حذف lazy class کار صحیحی نیست. چون بعدا قرار است از این حالت lazy بودن خارج شود.)</li>
   </ol>
+
+  ### سوال ۴
+  مورد اول: Large Class
+
+به دایرکتوری زیر توجه کنید: 
+```
+src/com/project/phase1CodeGeneration/Phase1CodeGenerator.java
+```
+در این فایل یک مثال واضح از Long Class می‌بینیم. ابتدای این فایل بصورت زیر است:
+```java
+public class Phase1CodeGenerator {
+
+    boolean successFull;
+
+    /// TODO move to CompleteDiagram
+    public Phase1CodeGenerator(CompleteDiagram diagram)
+    {
+        successFull = false;
+        ....
+
+```
+همانطور که مشاهده می‌کنید، این کلاس بیش از 330 خط است که نشان‌دهنده‌ی code smell با عنوان large class است. البته که این تنها مثال در کل این code base نیست و مثال‌های بیشتری از large class نیز در آن دیده می‌شود.
+
+مورد دوم: Long Method
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/lexicalAnalyzer/LexicalAnalyzer.java
+```
+
+در این فایل یک اینترفیس `lexicalAnalyzer` تعریف شده است که در آن تابع زیر وجود دارد:
+```java
+static Vector<Pair<TokenTypes, String>> getTokensOfPhase2Files(String fileName) {
+  ....
+    }
+```
+این تابع، طولی بیش از حدود 250 خط دارد!‌ که بدیهتا این طول زیاد برای یک تابع، نشان‌دهنده‌ی code smell با عنوان long method است و نگهداری و extendibility را بشدت کاهش می‌دهد.
+
+مورد سوم: Feature Envy
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/phase2CodeGeneration/Phase2CodeGenerator.java
+```
+که در آن کلاس زیر وجود دارد:
+```java
+public class Phase2CodeGenerator
+```
+در این کلاس، بیشتر از اینکه خود کلاس دارای property هایی باشد و به آنها دسترسی پیدا کند، به ویژگی‌های کلاس‌های دیگر دسترسی پیدا می‌کند. البته این مصداق در این قسمت کم است و شاید حتی قابل چشم‌پوشی باشد ولی همچنان اعمال refactoring هایی مثل MoveMethod و یا ExtractMethod می‌تواند آنرا بهبود دهد. درجاهای دیگری از این repository نیز envy های ریز و درشت متفاوت در جاهای مختلف و کلاس‌های مختلف می‌بینیم.
+
+مورد چهارم: Temporary Field
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/phase2CodeGeneration/ClassInfo.java
+```
+و یا این دایرکتوری:
+```
+src/com/project/classBaseUML/ClassStructure.java
+```
+در هر دوی این دایرکتوری‌ها، کلاس‌های ما دارای فیلدهایی هستند که بسیاری از اوقات می‌توانند null باشند و در برخی اوقات مقدار می‌گیرند. برای مثال، فیلد `superClass` در کلاس زیر:
+
+```java
+public class ClassStructure<TType extends ValueType, TAttribute extends ClassAttribute<TType>
+        , TConstructor extends ClassConstructor<TType, TAttribute>,
+        TMethod extends ClassMethod<TType, TAttribute>> implements DescriptiveMember {
+    private final Vector<TConstructor> constructors = new Vector<>();
+    private final Vector<TAttribute> attributes = new Vector<>();
+    private final Vector<TMethod> methods = new Vector<>();
+    private boolean havingDestructor = false;
+    private String superClass = "null";
+    private String name;
+
+    ...
+
+```
+و یا فیلد `name` در کلاس در دایرکتوری اول که برخی مواقع null است. مطابق تعریف، این‌ها می‌توانند code smell از نوع temporary field باشند و برای بهبود کیفیت کد باید آنها را حل کرد.
+یک feature envy مهم‌تر و واضح‌تر در دایرکتوری زیر است:
+```
+src/com/project/phase1CodeGeneration/CompleteDiagram.java
+```
+به متد زیر توجه کنید: 
+```java
+public String generateClassNamesSeparatedByNewline()
+{
+    StringBuilder stringBuilder = new StringBuilder();
+    for(String className:allClassNames())
+        stringBuilder.append(className).append(newLine);
+    return stringBuilder.toString();
+}
+```
+اینجا می‌بینید که این متد تماما در حال استفاده از className از کلاس ClassDiagram است و تمامی operation های آن وابسته به این کلاس است (بجز یک string concatenation ساده). پس بدیهی‌است که جابجایی آن به کلاس ClassDiagram می‌تواند ایده‌ی بهتری باشد.
+
+مورد پنجم: Dead Code
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/phase1CodeGeneration/CompleteDiagram.java
+```
+
+قطعه کدهایی در این کلاس هست که comment out شده اند و عملا استفاده نمی‌شوند و اجرا نمی‌شوند. برای مثال، قطعه کد زیر:
+
+```java
+    String generateDeleteBody() {
+        StringBuilder allLines = new StringBuilder();
+        allLines.append(voidKeyword + whiteSpace + mangledDeleteName())
+                .append(DescriptiveMember.generateParamsTogether(
+                new Vector<>(), CompleteAttribute.generateAttributeThisText(getName())));
+        allLines.append(newLine + openCurlyBracket + newLine);
+        allLines.append(tab).append(generateDestructorName())
+                .append(openParenthesis + thisKeyword + closeParenthesis + semiColon + newLine);
+//        allLines.append(tab + freeKeyword + openParenthesis).append(thisKeyword).append(closeParenthesis)
+//                .append(semiColon).append(newLine);
+        allLines.append(closeCurlyBracket).append(newLine);
+
+        return allLines.toString();
+    }
+```
+
+و یا در دایرکتوری زیر:
+```
+src/com/project/phase2CodeGeneration/phase2CodeFileManipulator.java
+```
+قطعه‌کد زیر را به همین صورت می‌بینیم:
+```java
+    private void printStack()
+    {
+        for(CompleteAttribute attribute : this.variableStack.lastElement())
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append(tab.repeat(Math.max(0,
+                    this.depthOfCurlyBracket + (lineState.equals(LineState.RETURN_LINE)? 1:0))));
+
+            if(diagramInfo.isHaveDestructor(attribute.getValueType().getTypeName()))
+                builder.append(deleteManipulate);
+//            else
+//                builder.append(freeKeyword);
+
+            if(diagramInfo.isHaveDestructor(attribute.getValueType().getTypeName()))
+                builder.append(openParenthesis).append(and).append(attribute.getName())
+                        .append(closeParenthesis).append(semiColon).append(newLine);
+            write(builder.toString());
+        }
+    }
+```
+
+در اینجا `buillder.append(freeKeyword);` کامنت شده است و عملا استفاده نمی‌شود. این نوع code smell به نام dead code است و باید حذف شود.
+
+مورد ششم: Data Class
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/graphBaseDependency/ClassNode.java
+```
+
+```java
+public class ClassNode {
+    private final Vector <DependencyEdge> edges;
+    private final String name;
+    private boolean visit;
+    private int dependencyCycleType;
+
+    ...
+```
+
+در این کلاس، فقط فیلدهایی وجود دارد و هیچ متدی برای انجام عملیات روی این فیلدها وجود ندارد. صرفا مجموعه‌ای از getter ها و setter ها را داریم و به خودی خود، عملیات مجزایی روی این فیلدها انجام نمی‌شود. این نوع code smell به نام data class است و برای بهبود کیفیت کد باید این کلاس را refactoring کرد.
+
+مورد هفتم: Speculative Generality
+
+برخی از component های کد در این codebase به وضوح برای استفاده‌ی در آینده و چیزهایی که هنوز implement نشده‌اند، over-engineered شده‌اند و به نوعی implement شده اند که آن تغییرات آینده را نیز ساپورت کنند (که هنوز implement نشده اند!). مثلا این نمونه را ببینید:
+
+```java
+// Unnecessarily generic/abstract enums and handlers that are overly prepared for future cases
+private enum LineState {
+    NEW_LINE,
+    POSSIBLY_INITIALIZER,  // Speculative state that's rarely used
+    DEFINITELY_NOT_A_INITIALIZER,
+    RETURN_LINE
+}
+
+private enum LocationState {
+    OUTSIDE,
+    STRUCTURE,
+    METHOD,
+    CONSTRUCTOR,
+    DESTRUCTOR  // Some of these states appear over-engineered
+}
+```
+
+و یا مثال زیر را ببینید:
+```java
+// File: MethodOverloader.java
+// Over-generalized for potential future parameter counts
+private int maxNumberOfParams;
+```
+این `maxNumberOfParameters` در هیچ‌جایی از کد، متفاوت از مفهوم `exactNumberOfParameters` استفاده نشده است! این یعنی که این component برای یک احتمال آینده over-engineered شده است. این نوع code smell به نام speculative generality است و برای بهبود کیفیت کد باید این component ها را refactoring کرد.
+
+مورد هشتم: Inappropriate Intimacy
+
+به مثال زیر توجه کنید:
+```java
+public class Phase2CodeFileManipulator {
+    // Too much intimate access to DiagramInfo class internals
+    private final DiagramInfo diagramInfo;
+
+    ...
+
+    // Excessive calls to DiagramInfo methods showing tight coupling:
+    diagramInfo.isHaveConstructor()
+    diagramInfo.isHaveDestructor() 
+    diagramInfo.getMethods()
+    diagramInfo.getAttributes()
+    diagramInfo.getClassNames()
+    ...
+}
+```
+در این مثال همانطور که می‌بینید، این کلاس با `DiagramInfo` مقدار زیادی coupled است. همانطور که در کد نیز مشخص است، به ذفعات زیادی و در موارد متنوعی، این کلاس به متدهای internal کلاس `DiagramInfo` دسترسی پیدا می‌کند و به آن وابسنه است. این نوع code smell به نام inappropriate intimacy است و برای بهبود کیفیت کد باید این دو component را refactoring کرد.
+
+مورد نهم: Switching Statements
+
+به دایرکتوری زیر توجه کنید:
+```
+src/com/project/lexicalAnalyzer/LexicalAnalyzer.java
+```
+که کد زیر در آن است:
+```java
+TokenTypes tokenType;
+            switch (type) {
+                case "AUTO":
+                    tokenType = TokenTypes.AUTO;
+                    break;
+                case "CHAR":
+                case "DOUBLE":
+                case "FLOAT":
+                case "INT":
+                case "LONG":
+                case "SHORT":
+                case "VOID":
+                    tokenType = TokenTypes.TYPES;
+                    break;
+                case "CONST":
+                    tokenType = TokenTypes.CONST;
+                    break;
+                .... 
+```
+که این switch statement بسیار طولانی است و ادامه دارد!‌ این، نمونه‌ای واضح از Switching Statements code smell است که برای رفع آن باید از ریفکتورینگ‌هایی مثل Strategy یا make a map استفاده کرد.
+
+مورد دهم: Data Clumps
+
+به این مورد توجه کنید:
+```java
+public class Phase2CodeFileManipulator {
+    // Data Clump 1: State-related fields that always appear together
+    private int numberOfClassCalled;
+    private int numberOfStructureKeywordCalled;
+    private int numberOfClassKeywordCalled;
+    private int numberOfTypeSpecifierCalled;
+    private int numberOfTypeDetailAdded;
+    private int numberOfIDCalled;
+    
+    // Data Clump 2: Depth tracking variables that are used together
+    private int depthOfParenthesis;
+    private int depthOfCurlyBracket;
+    
+    // Data Clump 3: Class tracking fields that are used together
+    private String firstClassCalled;
+    private String lastClassCalled;
+    private String locationClass;
+}
+```
+
+اینجا نمونه هایی واضح از data clump می‌بینیم که آنها را مشخص کرده‌ایم. مثلا، تمامی فیلدهایی که در بالا با عنوان `numberOf*` می‌بینید همه با هم تعریف شده و همه با یکدیگر استفاده می‌شوند (در متدهای این کلاس). پس بهتر است یک کلاس `CounterState` داشته باشیم و این‌ها را در آن کلاس encapsulate کنیم. موارد دیگر نیز در کامنت عنوان شده اند و نمونه‌هایی از code smell با عنوان Data Clump هستند که برای بهبود کیفیت کد باید آنها را refactoring کرد.
+
+### سوال ۵
+پلاگین formatter یک پلاگین maven است که براساس Eclipse Code formatter engine است و کمک می‌کند که کد را بر اساس standard های مشخصی format کنیم. در واقع این پلاگین به سادگی به ما کمک می‌کند تا کد جاوای خود را طوری فرمت کنیم که همواره از یک style مشخص پیروی کند. مثلا ساده‌ترین موارد formatting که توسط این پلاگین همگام‌سازی و مدیریت می‌شوند این‌ها هستند:
+
+<ul>
+  <li> Indentation </li>
+  <li> Line width </li>
+  <li> Spaces around operators </li>
+  <li> Brace Positions </li>
+  ...
+</ul>
+
+با داشتن یک فرمت consistent، کد ما خوانایی و maintainability بیشتری پیدا می‌کند. برای مثال* به ما کمک می‌کند تا از visual noise و distraction های حاصل از indentation یا bracelet یا موارد این‌چنینی فاصله بگیریم. همچنین با ادغام این پلاگین با maven، مطمئن می‌شویم که با develop های بیشتر از سمت افراد مختلف و با evolve پروژه‌مان، به مشکلات این‌چنینی بر نمی‌خوریم و این پلاگین این synchronization ها را برایمان انجام می‌دهد. (در واقع می‌توانیم آنرا بخشی از پایپلاین CI/CD خود بدانیم که قبل از merge شدن کد آنرا به این‌گونه refactor می‌کند). ارتباط آن با refactoring در این است که با عملیات‌هایی که انجام می‌دهد، "Readability" کد را بالا می‌برد، "Maintainability" را بهبود می‌بخشد و در نهایت، باعث ساده‌تر شدن "Team Collaboration" می‌شود (هر کس می‌تواند تنطیمات شخصی خود را داشته باشد و این تاثیری در آنچه که روی production مرج می‌شود ندارد). درواقع، این پلاگین انواع ساده‌ای از refactoring را بصورت automated انجام می‌دهد و اگر مشکلی بابت آن باشد، کد مدنظر merge نمی‌شود و conflict ها اعلام می‌شوند تا برطرف شوند. پس همیشه مطمئن هستیم که کدی که روی production می رود، فارغ از تنظیمات شخصی IDE و برنامه‌نویس آن، با باقی codebase کاملا سینک است و از این منظرهای ساده (ولی مهم) refactor شده است. 
