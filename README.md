@@ -1,34 +1,20 @@
-# MiniJava
-Mini-Java is a subset of Java. MiniJava compiler implement a compiler for the Mini-java
-programming language.
+# آزمایش هفتم
 
-# Rules of MiniJava
-```
-Goal --> Source EOF
-Source --> ClassDeclarations MainClass
-MainClass --> class Identifier { public static void main() { VarDeclarations Statements}}
-ClassDeclarations --> ClassDeclaration ClassDeclarations | lambda
-ClassDeclaration --> class Identifier Extension { FieldDeclarations MethodDeclarations }
-Extension --> extends Identifier | lambda
-FieldDeclarations --> FieldDeclaration FieldDeclarations | lambda
-FieldDeclaration --> static Type Identifier ;
-VarDeclarations --> VarDeclaration VarDeclarations | lambda
-VarDeclaration --> Type Identifier ;
-MethodDeclarations --> MethodDeclaration MethodDeclarations | lambda
-MethodDeclaration --> public static Type Identifier ( Parameters ) { VarDeclarations Statements return GenExpression ; }
-Parameters --> Type Identifier Parameter | lambda
-Parameter --> , Type Identifier Parameter | lambda
-Type --> boolean | int
-Statements --> Statements Statement | lambda
-Statement --> { Statements } | if ( GenExpression ) Statement else Statement | while ( GenExpression ) Statement | System.out.println ( GenExpression ) ; | Identifier = GenExpression ;
-GenExpression --> Expression | RelExpression
-Expression --> Expression + Term | Expression - Term | Term
-Term --> Term * Factor | Factor
-Factor --> ( Expression ) | Identifier | Identifier . Identifier | Identifier . Identifier ( Arguments ) | true | false | Integer
-RelExpression --> RelExpression && RelTerm | RelTerm
-RelTerm --> Expression == Expression | Expression < Expression
-Arguments --> GenExpression Argument | lambda
-Argument --> , GenExpression Argument | lambda
-Identifier --> <IDENTIFIER_LITERAL>
-Integer --> <INTEGER_LITERAL>
-```
+توضیحات هر کدام از ریفکنورها در این قسمت باید بیاید!
+
+## سوالات
+
+### سوال۱
+هر یک از مفاهیم زیر را به ترتیب توضیح می‌دهیم:
+
+<ul>
+  <li> کد تمیز: کدی تمیز است که به سادگی قابل خواندن، قابل درک و قابل نگهداری (maintain) باشد. گرچه تعریف کتاب clean code از uncle bob بسیار ساده‌تر است!‌ "کدی تمیز است که بتوان آنرا به سادگی فهمید. زیرا قابل درک بودن، این ویژگی‌ها را نتیجه می‌دهد: خوانابودن، تغییرپدیری،‌توانایی توسعه پدیری و توانایی نگهداری "</li>
+  <a href="https://gist.github.com/wojteklu/73c6914cc446146b8b533c0988cf8d29"> a summary of clean code </a>
+
+  <li> بدهی فنی: بدهی فنی یعنی هزینه‌ی بیشتری که باید بابت کار مجدد بپردازیم، زیرا در پیاده‌سازی آن بخش، قبل‌تر، مسیرهای ساده‌تر و سریع‌تر را به مسیرهای بهتر و long-term ولی با زمان پیاده‌سازی بیشتر برتری داده بودیم. درواقع، هزینه‌ی اضافه‌ی تحمیل شده به ما برای تغییر و یا extend کردن کد، بخاطر اینکه قبلا در پیاده‌سازیمان shortcut های ساده و سریع را به راه‌های تمیزتر و دقیق‌تر ولی با زمان بیشتر برتری داده بودیم، technical debt است.</li>
+  <a href="https://www.productplan.com/glossary/technical-debt/"> source </a>
+  <li> بوی بد: code smell به بخشی از قطعه‌ای کد گفته می‌شود که نشانگر مشکلات عمیق‌تر و جدی‌تر (شامل flaw در طراحی و یا معماری آن کد) می باشد، هرچند آن قطعه کد به درستی کار کند. درواقع bad smell پتانسیل‌ آن کد در malfunction در شرایط متفاوتی را بیان می‌کند که سبب مشکلات عمیق‌تری می‌شوند (مثلا عدم توانایی در extend کردن سیستم بعدها، و یا پایین آوردن maintainability و ...). این مشکلات می‌توانند در نهایت باعث کیفیت پایین کد و technical debt شوند.</li>
+  <a href="https://www.opsera.io/blog/what-is-code-smell#:~:text=Code%20Smells%20are%20the%20traces,code%20quality%20and%20technical%20debt."> source </a>
+
+
+</ul>
