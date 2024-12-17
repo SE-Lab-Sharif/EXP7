@@ -13,11 +13,11 @@ public class ReduceAction extends Action {
         for (int i = 0; i < rule.RHS.size(); i++) {
             parser.popStack();
         }
-        Log.print(/*"state : " +*/ parser.headStack() + "\t" + rule.LHS);
-//                        Log.print("LHS : "+rule.LHS);
+        Log.print(/* "state : " + */ parser.headStack() + "\t" + rule.LHS);
+        // Log.print("LHS : "+rule.LHS);
         parser.pushStack(parser.getParseTable().getGotoTable(parser.headStack(), rule.LHS));
-        Log.print(/*"new State : " + */parser.headStack() + "");
-//                        Log.print("");
+        Log.print(/* "new State : " + */parser.headStack() + "");
+        // Log.print("");
         try {
             parser.getCg().semanticFunction(rule.semanticAction, parser.getLookAhead());
         } catch (Exception e) {
