@@ -10,6 +10,8 @@ public class MemoryFacade {
     }
 
     public int getDateAddress() {
-        return memory.getDateAddress();
+        int ret = memory.getDateAddress();
+        memory.incrementDataAddress();
+        return ret;
     }
 }
