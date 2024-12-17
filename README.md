@@ -49,6 +49,8 @@
 ![Format Code](static/formatter_1.png)
 ![Format Code](static/formatter_2.png)
 
+---
+
 ## سوالات
 
 ### سوال ۱
