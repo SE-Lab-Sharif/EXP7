@@ -13,15 +13,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Stack;
 
-@Getter
 public class Parser {
+    @Getter
     private ArrayList<Rule> rules;
     private Stack<Integer> parsStack;
+    @Getter
     private ParseTable parseTable;
+    @Getter
     private lexicalAnalyzer lexicalAnalyzer;
+    @Getter
     private CodeGeneratorFacade cg;
+    @Getter
     @Setter
     private boolean finish;
+    @Getter
     @Setter
     private Token lookAhead;
 
@@ -51,32 +56,46 @@ public class Parser {
         Action currentAction;
         while (!finish) {
             try {
-                Log.print(/*"lookahead : "+*/ lookAhead.toString() + "\t" + parsStack.peek());
-//                Log.print("state : "+ parsStack.peek());
+                Log.print(/* "lookahead : "+ */ lookAhead.toString() + "\t" + parsStack.peek());
+                // Log.print("state : "+ parsStack.peek());
                 currentAction = parseTable.getActionTable(parsStack.peek(), lookAhead);
                 Log.print(currentAction.toString());
-                //Log.print("");
+                // Log.print("");
                 currentAction.act(this);
                 Log.print("");
             } catch (Exception ignored) {
                 ignored.printStackTrace();
-//                boolean find = false;
-//                for (NonTerminal t : NonTerminal.values()) {
-//                    if (parseTable.getGotoTable(parsStack.peek(), t) != -1) {
-//                        find = true;
-//                        parsStack.push(parseTable.getGotoTable(parsStack.peek(), t));
-//                        StringBuilder tokenFollow = new StringBuilder();
-//                        tokenFollow.append(String.format("|(?<%s>%s)", t.name(), t.pattern));
-//                        Matcher matcher = Pattern.compile(tokenFollow.substring(1)).matcher(lookAhead.toString());
-//                        while (!matcher.find()) {
-//                            lookAhead = lexicalAnalyzer.getNextToken();
-//                        }
-//                    }
-//                }
-//                if (!find)
-//                    parsStack.pop();
+                // boolean find = false;
+                // for (NonTerminal t : NonTerminal.values()) {
+                // if (parseTable.getGotoTable(parsStack.peek(), t) != -1) {
+                // find = true;
+                // parsStack.push(parseTable.getGotoTable(parsStack.peek(), t));
+                // StringBuilder tokenFollow = new StringBuilder();
+                // tokenFollow.append(String.format("|(?<%s>%s)", t.name(), t.pattern));
+                // Matcher matcher = Pattern.compile(tokenFollow.substring(1)).matcher(lookAhead.toString());
+                // while (!matcher.find()) {
+                // lookAhead = lexicalAnalyzer.getNextToken();
+                // }
+                // }
+                // }
+                // if (!find)
+                // parsStack.pop();
             }
         }
-        if (!ErrorHandler.hasError) cg.printMemory();
+        if (!ErrorHandler.hasError)
+            cg.printMemory();
     }
+
+    public int popStack() {
+        return parsStack.pop();
+    }
+
+    public int headStack() {
+        return parsStack.peek();
+    }
+
+    public void pushStack(int state) {
+        parsStack.push(state);
+    }
+
 }
